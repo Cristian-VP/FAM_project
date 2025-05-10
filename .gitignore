@@ -1,0 +1,36 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Caches
+*.egg-info/
+*.eggs/
+.cache/
+dist/
+build/
+
+# Virtual environments
+.venv/
+
+
+# PyCharm project settings
+.idea/
+
+# dotenv environment variables
+.env
+.env.*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# VS Code (en caso de usarlo también)
+.vscode/
+
+# Jupyter Notebook checkpoints (por si usás notebooks)
+.ipynb_checkpoints/
+
+# MongoDB dumps (por si exportás datos locales)
+*.mongodb
+dump/
