@@ -16,12 +16,14 @@ async def list_tasks(request: Request):
 @router.post('/', response_description="Crear una tarea")
 async def create_task(request: Request, task: TaskCreate = Body(...)):
     Tasks = request.app.mongodb['tasks']
-    task = task.dict(by_alias=True)
-    if await Tasks.find_one({'title': task['title']}):
-        raise HTTPException(status_code=400, detail=f"Tarea '{task['title']}' ya existe.")
-    new_task = await Tasks.insert_one(task)
-    created_task = await Tasks.find_one({'_id': task['_id']})
-    return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(created_task))
+    # Verifica si ya existe una tarea con el mismo título
+    if await Tasks.find_one({'title': task.title}):
+        raise HTTPException(status_code=400, detail=f"Tarea '{task.title}' ya existe.")
+    # Construye el objeto TaskBase con todos los campos requeridos
+    task_data = TaskBase(**task.dict())
+    # Inserta el documento usando los alias correctos para MongoDB
+    await Tasks.insert_one(task_data.model_dump(by_alias=True))
+    return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(task_data))
 
 @router.patch('/{id}', response_description="Actualizar una tarea")
 async def update_task(id: str, request: Request, task: TaskUpdate = Body(...)):
