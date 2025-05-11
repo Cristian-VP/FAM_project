@@ -20,7 +20,7 @@ async def create_task(request: Request, task: TaskCreate = Body(...)):
     if await Tasks.find_one({'title': task.title}):
         raise HTTPException(status_code=400, detail=f"Tarea '{task.title}' ya existe.")
     # Construye el objeto TaskBase con todos los campos requeridos
-    task_data = TaskBase(**task.dict())
+    task_data = TaskBase(**task.model_dump())
     # Inserta el documento usando los alias correctos para MongoDB
     await Tasks.insert_one(task_data.model_dump(by_alias=True))
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=jsonable_encoder(task_data))
@@ -28,7 +28,7 @@ async def create_task(request: Request, task: TaskCreate = Body(...)):
 @router.patch('/{id}', response_description="Actualizar una tarea")
 async def update_task(id: str, request: Request, task: TaskUpdate = Body(...)):
     Tasks = request.app.mongodb['tasks']
-    task = task.dict(exclude_unset=True, by_alias=True)
+    task = task.model_dump(exclude_unset=True, by_alias=True)
     if 'title' in task and not task['title']:
         raise HTTPException(status_code=400, detail="El título no puede estar vacío.")
     if not await Tasks.find_one({"_id": id}):
